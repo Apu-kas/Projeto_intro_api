@@ -1,20 +1,36 @@
-from flask import Flask, jsonify
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from config import Config
+from models import db
+from controllers.tarefa_controller import TarefaController
+from routes.tarefas_routes import tarefas_bp
 
-app = Flask(__name__)
+def criar_app():
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = Config.SECRET_KEY
+    app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URL
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = Config.SQLALCHEMY_TRACK_MODIFICATIONS
 
-@app.route('/api/hello' , methods = ['GET'])
-def hello_world():
-    return jsonify({'message' : 'Olá, Mundo! Bem-vindo à API Flask'})
+    db.init_app(app)
 
-@app.route('/api/tarefas' , methods = ['GET'])
-def get_tarefas():
-    tarefas = [
-        {id:1, 'titulo': 'Estudar Flask' , 'Concluída' : False},
-        {id:2, 'titulo': 'Criar primeira API' , 'Concluída' : False},
-        {id:2, 'titulo': 'Testar Endpoints' , 'Concluída' : False}
-    ]
-    return jsonify ({'tarefas' : tarefas})
+    app.register_blueprint(tarefas_bp)
+
+    return app
+
+
+
 
 if __name__ == '__main__':
+    app = criar_app()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
+
+
+
+
+
+
+
+
 
