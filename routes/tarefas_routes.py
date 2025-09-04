@@ -22,3 +22,18 @@ def criar_tarefa():
     concluida = dados.get('concluida', False)
     nova_tarefa = TarefaController.post_criar_tarefa(id, {'titulo': titulo}, concluida)
     return jsonify(nova_tarefa.to_dict()), 201
+
+@tarefas_bp.route('/api/remover_tarefa/<int:tarefa_id>', methods=['DELETE'])
+def remover_tarefa(tarefa_id):
+    sucesso = TarefaController.deletar_tarefa(tarefa_id)
+    if sucesso:
+        return jsonify({'messagem': 'Tarefa removida com sucesso'})
+    return jsonify({'messagem': 'Tarefa não encontrada'}), 404
+
+@tarefas_bp.route('/api/atualizar_tarefa/<int:tarefa_id>', methods=['PUT'])
+def atualizar_tarefa(tarefa_id):
+    dados = request.get_json()
+    tarefa_atualizada = TarefaController.put_atualizar_tarefa(tarefa_id, dados)
+    if tarefa_atualizada:
+        return jsonify(tarefa_atualizada.to_dict())
+    return jsonify({'messagem': 'Tarefa não encontrada'}), 404
